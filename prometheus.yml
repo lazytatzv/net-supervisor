@@ -11,14 +11,14 @@ scrape_configs:
       - targets: ["100.114.200.30:9100"]
 
   - job_name: "speedtest"
-    scrape_interval: 1h
-    scrape_timeout: 300s
+    scrape_interval: 1m
+    scrape_timeout: 90s
     static_configs:
       - targets: ['localhost:9798']
 
   - job_name: "speedtest-nuc"
-    scrape_interval: 1h
-    scrape_timeout: 300s
+    scrape_interval: 1m
+    scrape_timeout: 90s
     static_configs:
       - targets: ['100.114.200.30:9798']
 
