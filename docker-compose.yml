@@ -1,0 +1,39 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9091:9090" # Tailscaledとのポート競合を避ける
+    #extra_hosts:
+    #  - "host.docker.internal:host-gateway" # コンテナ内からホストマシンへ通信するための設定
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+
+  node-exporter: # 9100
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node-exporter
+    command:
+      - '--path.rootfs=/host'
+    #network_mode: "host"
+    #pid: "host"
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
+
+# Tailscale環境下でのパケットドロップ（タイムアウト）を防ぐためのMTU設定
+networks:
+  default:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1280
